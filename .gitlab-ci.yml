@@ -1,0 +1,30 @@
+image: jangrewe/gitlab-ci-android
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .gradle/
+
+before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
+
+stages:
+  - build
+
+assembleDebug:
+  stage: build
+  only:
+    - main
+  script:
+    - ./gradlew make
+    - |
+      cp **/build/*.zip $CI_BUILDS_DIR/builds
+      git checkout builds
+      cd $CI_BUILDS_DIR/builds
+      cp ../src/updater.json .
+      git config --local user.email "actions@github.com"
+      git config --local user.name "GitHub Actions"
+      git add .
+      git commit -m "Build $CI_COMMIT_SHA" || exit 0   # do not error if nothing to commit
+      git push
