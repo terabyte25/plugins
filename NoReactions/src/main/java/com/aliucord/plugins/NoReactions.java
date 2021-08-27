@@ -1,4 +1,4 @@
-package com.halal.plugins;
+package com.aliucord.plugins;
 
 import java.util.Collection;
 
@@ -20,7 +20,7 @@ public class NoReactions extends Plugin {
         manifest.authors = new Manifest.Author[]{new Manifest.Author("DISCORD USERNAME", 123456789L)};
         manifest.description = "No Reactions";
         manifest.version = "1.0.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/USERNAME/REPONAME/builds/updater.json";
+        manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
         return manifest;
     }
 

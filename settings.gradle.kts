@@ -1,7 +1,5 @@
 include(":NoReactions")
-project(":NoReactions").projectDir = File("./NoReactions")
-
 include(":VCID")
-project(":VCID").projectDir = File("./VCID")
+include(":VideoEmbedPatch")
 
 rootProject.name = "HalalPlugins"
