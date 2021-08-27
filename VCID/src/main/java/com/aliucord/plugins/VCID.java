@@ -1,4 +1,4 @@
-package com.halal.plugins;
+package com.aliucord.plugins;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -25,7 +25,7 @@ public class VCID extends Plugin {
         manifest.authors = new Manifest.Author[]{new Manifest.Author("HalalKing#1551", 261634919980204033L)};
         manifest.description = "Voice Channel ID";
         manifest.version = "1.0.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/USERNAME/REPONAME/builds/updater.json";
+        manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
         return manifest;
     }
 
