@@ -45,7 +45,7 @@ public class VCID extends Plugin {
                 binding.a.setOnLongClickListener(view -> {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                     android.content.ClipData clip = android.content.ClipData.newPlainText("Copied to clipboard.", String.valueOf(channel.getChannel().h()));
-                    int duration = Toast.LENGTH_LONG;
+                    int duration = Toast.LENGTH_SHORT;
                     Toast.makeText(context, "Copied to clipboard.", duration).show();
                     clipboard.setPrimaryClip(clip);
                     return true;
