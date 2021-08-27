@@ -1,5 +1,3 @@
-include(":HalalPlugins")
-
 include(":NoReactions")
 project(":NoReactions").projectDir = File("./NoReactions")
 
