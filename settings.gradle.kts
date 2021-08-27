@@ -1,15 +1,9 @@
-// include(":MyFirstPlugin")
+include(":HalalPlugins")
 
-include(":CatApi")
-project(":CatApi").projectDir = File("./ExamplePlugins/CatApi")
+include(":NoReactions")
+project(":NoReactions").projectDir = File("./NoReactions")
 
-include(":HelloWorld")
-project(":HelloWorld").projectDir = File("./ExamplePlugins/HelloWorld")
+include(":VCID")
+project(":VCID").projectDir = File("./VCID")
 
-include(":HelloWorldAdvanced")
-project(":HelloWorldAdvanced").projectDir = File("./ExamplePlugins/HelloWorldAdvanced")
-
-include(":MyFirstPatch")
-project(":MyFirstPatch").projectDir = File("./ExamplePlugins/MyFirstPatch")
-
-rootProject.name = "AliucordPlugins"
+rootProject.name = "HalalPlugins"
