@@ -9,5 +9,8 @@
     },
     "VCID": {
         "version": "1.0.0"
+    },
+    "VideoEmbedPatch": {
+        "version": "1.0.0"
     }
 }
