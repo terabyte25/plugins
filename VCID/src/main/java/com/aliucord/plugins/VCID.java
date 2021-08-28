@@ -23,7 +23,7 @@ public class VCID extends Plugin {
     public Manifest getManifest() {
         var manifest = new Manifest();
         manifest.authors = new Manifest.Author[]{new Manifest.Author("HalalKing#1551", 261634919980204033L)};
-        manifest.description = "Voice Channel ID";
+        manifest.description = "VCID";
         manifest.version = "1.0.0";
         manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
         return manifest;
