@@ -1,4 +1,5 @@
 import com.android.build.gradle.BaseExtension
+import com.aliucord.gradle.AliucordExtension
 
 buildscript {
     repositories {
@@ -21,6 +22,7 @@ allprojects {
 }
 
 fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
+fun Project.aliucord(configuration: AliucordExtension.() -> Unit) = extensions.getByName<AliucordExtension>("aliucord").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -50,6 +52,12 @@ subprojects {
         implementation("androidx.appcompat:appcompat:1.3.1")
         implementation("com.google.android.material:material:1.4.0")
         implementation("androidx.constraintlayout:constraintlayout:2.1.0")
+    }
+
+    aliucord {
+        author("HalalKing", 261634919980204033L)
+        updateUrl.set("https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json")
+        buildUrl.set("https://raw.githubusercontent.com/terabyte25/plugins/builds/%s.zip")
     }
 }
 
