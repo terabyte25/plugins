@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PinePatchFn;
 import com.discord.databinding.WidgetChannelsListItemChannelVoiceBinding;
@@ -16,6 +17,7 @@ import com.discord.widgets.channels.list.items.ChannelListItemVoiceChannel;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
+@AliucordPlugin
 public class VCID extends Plugin {
     @NonNull
     @Override
