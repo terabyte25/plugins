@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.aliucord.Logger;
+import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PineInsteadFn;
 import com.aliucord.patcher.PinePatchFn;
@@ -37,21 +38,10 @@ import d0.t.u;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
+@AliucordPlugin
 public class VideoEmbedPatch extends Plugin {
     private final Pattern mediaRegex = Pattern.compile("(https:\\/\\/)media(\\.discordapp\\.)net(\\/attachments\\/\\d+\\/\\d+\\/.+(\\.mov|\\.mp4|\\.webm))");
     private final Logger log = new Logger();
-    
-    @NonNull
-    @Override
-    // Plugin Manifest - Required
-    public Manifest getManifest() {
-        var manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{new Manifest.Author("HalalKing#1551", 261634919980204033L)};
-        manifest.description = "VideoEmbedPatch";
-        manifest.version = "1.0.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
-        return manifest;
-    }
 
     @SuppressLint("SetTextI18n")
     @Override

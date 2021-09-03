@@ -6,11 +6,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PineInsteadFn;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
+@AliucordPlugin
 public class NoReactions extends Plugin {
     @NonNull
     @Override
