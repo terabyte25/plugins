@@ -49,17 +49,18 @@ public class VideoEmbedPatch extends Plugin {
     public void start(Context context) throws Throwable {
         // add the patch
         // TODO: not use a hacky way of getting the method
-        patcher.patch(IntentUtils.class.getMethods()[11], new PinePrePatchFn(callFrame -> {
+        patcher.patch(IntentUtils.class.getDeclaredMethod("performChooserSendIntent", Context.class, String.class, CharSequence.class), new PinePrePatchFn(callFrame -> {
             callFrame.args[1] = fixMediaUrl(callFrame.args[1].toString());
         }));
+
+        var field = MessagePreprocessor.class.getDeclaredField("embeds");
+        field.setAccessible(true);
 
         patcher.patch("com.discord.utilities.textprocessing.MessagePreprocessor", "stripSimpleEmbedLink", new Class<?>[] {Collection.class}, new PineInsteadFn(callFrame -> {
             var collection = (Collection<Node<MessageRenderContext>>) callFrame.args[0];
 
             // fucky reflection shit that should not be done
             try {
-                var field = MessagePreprocessor.class.getDeclaredField("embeds");
-                field.setAccessible(true);
                 var embeds = (List<MessageEmbed>) field.get(callFrame.thisObject);
 
                 if (collection.size() == 1 && embeds != null && embeds.size() == 1) {
@@ -68,7 +69,7 @@ public class VideoEmbedPatch extends Plugin {
                         collection.clear();
                     }
                 }
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (IllegalAccessException e) {
                 log.error(context, e);
             }
 
