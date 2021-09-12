@@ -8,8 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
@@ -27,18 +25,6 @@ import com.lytefast.flexinput.R;
 @SuppressWarnings("unused")
 @AliucordPlugin
 public class VCID extends Plugin {
-    @NonNull
-    @Override
-    // Plugin Manifest - Required
-    public Manifest getManifest() {
-        var manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{new Manifest.Author("HalalKing#1551", 261634919980204033L)};
-        manifest.description = "VCID";
-        manifest.version = "1.1.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
-        return manifest;
-    }
-
     @SuppressLint("SetTextI18n")
     @Override
     // Called when your plugin is started. This is the place to register command, add patches, etc
