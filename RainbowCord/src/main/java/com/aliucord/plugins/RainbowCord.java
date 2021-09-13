@@ -54,7 +54,7 @@ public class RainbowCord extends Plugin {
 
             addView(textInput);
             addView(createCheckedSetting(view.getContext(), "Rainbow Typing Box", "rainbowTyping", true));
-            addView(createCheckedSetting(view.getContext(), "Rainbow Messages", "rainbowMessages", false));
+            addView(createCheckedSetting(view.getContext(), "Rainbow Messages (may be laggy)", "rainbowMessages", false));
         }
 
         private CheckedSetting createCheckedSetting(Context ctx, String title, String setting, boolean checked) {
