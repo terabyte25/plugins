@@ -2,7 +2,6 @@ package com.aliucord.plugins;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.text.Editable;
 import android.text.InputType;
 import android.view.View;
@@ -46,9 +45,12 @@ public class RainbowCord extends Plugin {
             textInput.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    settings.setLong("colorSpeed", Long.parseLong(editable.toString()));
-                    PluginManager.stopPlugin("RainbowCord");
-                    PluginManager.startPlugin("RainbowCord");
+                    try {
+                        if (Long.valueOf(editable.toString()) != 0)
+                            settings.setLong("colorSpeed", Long.valueOf(editable.toString()));
+                    } catch (Exception e) {
+                        settings.setLong("colorSpeed", RainbowCord.DEFAULT_SPEED);
+                    }
                 }
             });
 
@@ -72,7 +74,7 @@ public class RainbowCord extends Plugin {
     }
 
     private final Logger log = new Logger();
-    private static final int[] animatedColors = {Color.parseColor("#e5e5ea"), Color.parseColor("#fea7b9"), Color.parseColor("#cd9aec"), Color.parseColor("#b5b8f8"), Color.parseColor("#87beff"), Color.parseColor("#97f2c3"), Color.parseColor("#bbe061"), Color.parseColor("#f9e560"), Color.parseColor("#ffb43f"), Color.parseColor("#cfa075"), Color.parseColor("#e5e5ea")};
+    private static final int[] animatedColors = {0xFFe5e5ea, 0xFFfea7b9, 0xFFcd9aec, 0xFFb5b8f8, 0xFF87beff, 0xFF97f2c3, 0xFFbbe061, 0xFFf9e560, 0xFFffb43f, 0xFFcfa075, 0xFFe5e5ea};
     private static final long DEFAULT_SPEED = 5000;
 
     public RainbowCord() {
