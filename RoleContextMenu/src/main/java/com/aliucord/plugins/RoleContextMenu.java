@@ -55,16 +55,19 @@ public class RoleContextMenu extends Plugin {
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) throws NoSuchMethodException {
         patcher.patch(RolesListView$updateView$$inlined$forEach$lambda$1.class.getDeclaredMethod("onClick", View.class), new PineInsteadFn(callFrame -> {
-            var role = ((RolesListView$updateView$$inlined$forEach$lambda$1)callFrame.thisObject).$role;
+            try {
+                var role = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).$role;
 
-            Bundle args = new Bundle();
-            args.putString("roleColor", String.format("%06x", role.b()));
-            args.putString("roleId", String.valueOf(role.getId()));
+                Bundle args = new Bundle();
+                args.putString("roleColor", String.format("%06x", role.b()));
+                args.putString("roleId", String.valueOf(role.getId()));
 
-            var roleMenu = new RoleBottomSheet();
-            roleMenu.setArguments(args);
-            roleMenu.show(Utils.appActivity.getSupportFragmentManager(), "Role Menu");
-
+                var roleMenu = new RoleBottomSheet();
+                roleMenu.setArguments(args);
+                roleMenu.show(Utils.appActivity.getSupportFragmentManager(), "Role Menu");
+            } catch (Exception e) {
+                log.error(e);
+            }
             return null;
         }));
     }
