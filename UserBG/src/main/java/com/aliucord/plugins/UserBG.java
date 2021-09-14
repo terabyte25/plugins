@@ -14,6 +14,9 @@ import com.discord.widgets.user.profile.UserProfileHeaderViewModel;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused"})
@@ -23,6 +26,7 @@ public class UserBG extends Plugin {
     private final String regex = ".*?\\(\"(.*?)\"";
     private String css;
     private final Logger log = new Logger();
+    private Map<Long, String> urlCache = new HashMap<Long, String>();
     @Override
     public void start(Context ctx) {
         try {
@@ -34,13 +38,8 @@ public class UserBG extends Plugin {
                     css = loadFromCache(cachedFile);
                     log.debug("Loaded USRBG database.");
 
-                    if (ifRecache(cachedFile.lastModified())) {
-                        log.debug("Downloading USRBG database...");
-                        Http.simpleDownload(url, cachedFile);
-                        log.debug("Done downloading database.");
-
-                        css = loadFromCache(cachedFile);
-                        log.debug("Updated USRBG database.");
+                    if (ifRecache(cachedFile.lastModified()) || css.isEmpty() || css == null) {
+                        downloadDB(cachedFile);
                     }
                 } catch (Throwable e) { log.error(e); }
             }).start();
@@ -49,26 +48,35 @@ public class UserBG extends Plugin {
                 if (css == null) return; // could not get USRBG database in time or wasn't available
 
                 var id = (long) callFrame.args[0];
-                var matcher = Pattern.compile(id + regex, Pattern.DOTALL).matcher(css);
-                if (matcher.find()) {
-                    log.debug(matcher.group(1));
-                    callFrame.setResult(withSize(matcher.group(1), (Integer) callFrame.args[2]));
+
+                if (urlCache.containsKey(id))
+                    callFrame.setResult(withSize(urlCache.get(id), (Integer) callFrame.args[2]));
+                else {
+                    var matcher = Pattern.compile(id + regex, Pattern.DOTALL).matcher(css);
+                    if (matcher.find()) {
+                        String url = matcher.group(1);
+                        urlCache.put(id, url);
+                        callFrame.setResult(withSize(url, (Integer) callFrame.args[2]));
+                    }
                 }
             }));
 
             if (PluginManager.isPluginEnabled("ViewProfileImages")) { // inb4 ven asks what the hell im doing
                 patcher.patch(UserProfileHeaderViewModel.ViewState.Loaded.class.getDeclaredMethod("getBanner"), new PinePatchFn(callFrame -> {
-                    if (css == null)
-                        return; // could not get USRBG database in time or wasn't available
                     var user = ((UserProfileHeaderViewModel.ViewState.Loaded) callFrame.thisObject).getUser();
-                    var id = (long) user.getId();
-                    var matcher = Pattern.compile(id + regex, Pattern.DOTALL).matcher(css);
-                    if (matcher.find()) {
-                        callFrame.setResult(matcher.group(1));
-                    }
+                    if (urlCache.containsKey(user.getId())) callFrame.setResult(urlCache.get(user.getId()));
                 }));
             }
         } catch (Throwable e) { log.error(e); }
+    }
+
+    private void downloadDB(File cachedFile) throws IOException {
+        log.debug("Downloading USRBG database...");
+        Http.simpleDownload(url, cachedFile);
+        log.debug("Done downloading database.");
+
+        css = loadFromCache(cachedFile);
+        log.debug("Updated USRBG database.");
     }
 
     private String loadFromCache(File cache) {
