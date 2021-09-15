@@ -5,5 +5,6 @@ include(":ReactionEmojiName")
 include(":RainbowCord")
 include(":RoleContextMenu")
 include(":UserBG")
+include(":ShittyDownloadStickers")
 
 rootProject.name = "HalalPlugins"

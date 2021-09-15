@@ -8,6 +8,7 @@ import com.aliucord.PluginManager;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PinePatchFn;
+import com.aliucord.patcher.PinePrePatchFn;
 import com.aliucord.utils.IOUtils;
 import com.discord.utilities.icon.IconUtils;
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel;
@@ -22,27 +23,22 @@ import java.util.regex.Pattern;
 @SuppressWarnings({"unused"})
 @AliucordPlugin
 public class UserBG extends Plugin {
+    public final static long REFRESH_CACHE_TIME = 6*60;
+
     private static final String url = "https://usrbg.cumcord.com/";
     private final String regex = ".*?\\(\"(.*?)\"";
     private String css;
     private final Logger log = new Logger();
     private Map<Long, String> urlCache = new HashMap<Long, String>();
+
+    public UserBG() {
+        settingsTab = new SettingsTab(PluginSettings.class).withArgs(settings);
+    }
+
     @Override
     public void start(Context ctx) {
         try {
-            new Thread(() -> {
-                try {
-                    final File cachedFile = new File(ctx.getCacheDir(), "db.css");
-                    cachedFile.createNewFile();
-
-                    css = loadFromCache(cachedFile);
-                    log.debug("Loaded USRBG database.");
-
-                    if (ifRecache(cachedFile.lastModified()) || css.isEmpty() || css == null) {
-                        downloadDB(cachedFile);
-                    }
-                } catch (Throwable e) { log.error(e); }
-            }).start();
+            getDB(ctx);
 
             patcher.patch(IconUtils.class.getDeclaredMethod("getForUserBanner", long.class, String.class, Integer.class, boolean.class), new PinePatchFn(callFrame -> {
                 if (css == null) return; // could not get USRBG database in time or wasn't available
@@ -61,13 +57,44 @@ public class UserBG extends Plugin {
                 }
             }));
 
+            if (settings.getBool("downscaleToFrame", false)) {
+                // shitty "optimization" features
+                patcher.patch(c.f.j.a.c.a.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
+                    callFrame.args[3] = true;
+                })));
+
+                patcher.patch(c.f.j.e.p.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
+                    callFrame.args[8] = true;
+                    callFrame.args[9] = true;
+                    // i, e
+                    // z7, z6
+                })));
+            }
+
             if (PluginManager.isPluginEnabled("ViewProfileImages")) { // inb4 ven asks what the hell im doing
                 patcher.patch(UserProfileHeaderViewModel.ViewState.Loaded.class.getDeclaredMethod("getBanner"), new PinePatchFn(callFrame -> {
+                    if (css == null) return;
                     var user = ((UserProfileHeaderViewModel.ViewState.Loaded) callFrame.thisObject).getUser();
                     if (urlCache.containsKey(user.getId())) callFrame.setResult(urlCache.get(user.getId()));
                 }));
             }
         } catch (Throwable e) { log.error(e); }
+    }
+
+    private void getDB(Context ctx) {
+        new Thread(() -> {
+            try {
+                final File cachedFile = new File(ctx.getCacheDir(), "db.css");
+                cachedFile.createNewFile();
+
+                css = loadFromCache(cachedFile);
+                log.debug("Loaded USRBG database.");
+
+                if (ifRecache(cachedFile.lastModified()) || css.isEmpty() || css == null) {
+                    downloadDB(cachedFile);
+                }
+            } catch (Throwable e) { log.error(e); }
+        }).start();
     }
 
     private void downloadDB(File cachedFile) throws IOException {
@@ -85,7 +112,6 @@ public class UserBG extends Plugin {
         } catch (Throwable e) {
             log.error(e);
         }
-
         return null;
     }
 
@@ -94,7 +120,7 @@ public class UserBG extends Plugin {
     }
 
     private boolean ifRecache(long lastModified) {
-        return (System.currentTimeMillis() - lastModified) > (6*60*60*1000); // 6 hours
+        return (System.currentTimeMillis() - lastModified) > (settings.getLong("cacheTime", UserBG.REFRESH_CACHE_TIME)*60*1000); // 6 hours
     }
 
     @Override
