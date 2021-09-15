@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
@@ -19,10 +21,13 @@ import com.lytefast.flexinput.R;
 @SuppressWarnings("unused")
 @AliucordPlugin
 public class RoleContextMenu extends Plugin {
+    private static FragmentManager cachedFragment = null;
     public static class RoleBottomSheet extends BottomSheet {
         public void onViewCreated(View view, Bundle bundle) {
             super.onViewCreated(view, bundle);
-
+            if (cachedFragment == null) {
+                cachedFragment = getParentFragmentManager();
+            }
             TextView textView = new TextView(view.getContext(), null, 0, R.h.UiKit_Settings_Item_Icon);
             textView.setText("Copy ID");
             textView.setCompoundDrawablesWithIntrinsicBounds(R.d.ic_content_copy_white_a60_24dp, 0,0, 0);
@@ -64,7 +69,7 @@ public class RoleContextMenu extends Plugin {
 
                 var roleMenu = new RoleBottomSheet();
                 roleMenu.setArguments(args);
-                roleMenu.show(Utils.appActivity.getSupportFragmentManager(), "Role Menu");
+                roleMenu.show(cachedFragment == null ? Utils.appActivity.getSupportFragmentManager() : cachedFragment, "Role Menu");
             } catch (Exception e) {
                 log.error(e);
             }
