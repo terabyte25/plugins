@@ -35,49 +35,47 @@ public class UserBG extends Plugin {
     }
 
     @Override
-    public void start(Context ctx) {
-        try {
-            getDB(ctx);
+    public void start(Context ctx) throws NoSuchMethodException {
+        getDB(ctx);
 
-            patcher.patch(IconUtils.class.getDeclaredMethod("getForUserBanner", long.class, String.class, Integer.class, boolean.class), new PinePatchFn(callFrame -> {
-                if (css == null) return; // could not get USRBG database in time or wasn't available
+        patcher.patch(IconUtils.class.getDeclaredMethod("getForUserBanner", long.class, String.class, Integer.class, boolean.class), new PinePatchFn(callFrame -> {
+            if (css == null) return; // could not get USRBG database in time or wasn't available
 
-                var id = (long) callFrame.args[0];
+            var id = (long) callFrame.args[0];
 
-                if (urlCache.containsKey(id))
-                    callFrame.setResult(withSize(urlCache.get(id), (Integer) callFrame.args[2]));
-                else {
-                    var matcher = Pattern.compile(id + regex, Pattern.DOTALL).matcher(css);
-                    if (matcher.find()) {
-                        String url = matcher.group(1);
-                        urlCache.put(id, url);
-                        callFrame.setResult(withSize(url, (Integer) callFrame.args[2]));
-                    }
+            if (urlCache.containsKey(id))
+                callFrame.setResult(withSize(urlCache.get(id), (Integer) callFrame.args[2]));
+            else {
+                var matcher = Pattern.compile(id + regex, Pattern.DOTALL).matcher(css);
+                if (matcher.find()) {
+                    String url = matcher.group(1);
+                    urlCache.put(id, url);
+                    callFrame.setResult(withSize(url, (Integer) callFrame.args[2]));
                 }
+            }
+        }));
+
+        if (settings.getBool("downscaleToFrame", false)) {
+            // shitty "optimization" features
+            patcher.patch(c.f.j.a.c.a.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
+                callFrame.args[3] = true;
+            })));
+
+            patcher.patch(c.f.j.e.p.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
+                callFrame.args[8] = true;
+                callFrame.args[9] = true;
+                // i, e
+                // z7, z6
+            })));
+        }
+
+        if (PluginManager.isPluginEnabled("ViewProfileImages")) { // inb4 ven asks what the hell im doing
+            patcher.patch(UserProfileHeaderViewModel.ViewState.Loaded.class.getDeclaredMethod("getBanner"), new PinePatchFn(callFrame -> {
+                if (css == null) return;
+                var user = ((UserProfileHeaderViewModel.ViewState.Loaded) callFrame.thisObject).getUser();
+                if (urlCache.containsKey(user.getId())) callFrame.setResult(urlCache.get(user.getId()));
             }));
-
-            if (settings.getBool("downscaleToFrame", false)) {
-                // shitty "optimization" features
-                patcher.patch(c.f.j.a.c.a.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
-                    callFrame.args[3] = true;
-                })));
-
-                patcher.patch(c.f.j.e.p.class.getConstructors()[0], new PinePrePatchFn((callFrame -> {
-                    callFrame.args[8] = true;
-                    callFrame.args[9] = true;
-                    // i, e
-                    // z7, z6
-                })));
-            }
-
-            if (PluginManager.isPluginEnabled("ViewProfileImages")) { // inb4 ven asks what the hell im doing
-                patcher.patch(UserProfileHeaderViewModel.ViewState.Loaded.class.getDeclaredMethod("getBanner"), new PinePatchFn(callFrame -> {
-                    if (css == null) return;
-                    var user = ((UserProfileHeaderViewModel.ViewState.Loaded) callFrame.thisObject).getUser();
-                    if (urlCache.containsKey(user.getId())) callFrame.setResult(urlCache.get(user.getId()));
-                }));
-            }
-        } catch (Throwable e) { log.error(e); }
+        }
     }
 
     private void getDB(Context ctx) {
