@@ -6,5 +6,6 @@ include(":RainbowCord")
 include(":RoleContextMenu")
 include(":UserBG")
 include(":ShittyDownloadStickers")
+include(":PersistSettings")
 
 rootProject.name = "HalalPlugins"
