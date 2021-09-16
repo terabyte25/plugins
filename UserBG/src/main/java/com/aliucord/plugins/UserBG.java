@@ -15,7 +15,6 @@ import com.discord.widgets.user.profile.UserProfileHeaderViewModel;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -27,8 +26,8 @@ public class UserBG extends Plugin {
 
     private static final String url = "https://usrbg.cumcord.com/";
     private final String regex = ".*?\\(\"(.*?)\"";
-    private String css;
-    private final Logger log = new Logger();
+    private static String css;
+    private static final Logger log = new Logger();
     private Map<Long, String> urlCache = new HashMap<Long, String>();
 
     public UserBG() {
@@ -84,7 +83,7 @@ public class UserBG extends Plugin {
     private void getDB(Context ctx) {
         new Thread(() -> {
             try {
-                final File cachedFile = new File(ctx.getCacheDir(), "db.css");
+                File cachedFile = getCacheFile(ctx);
                 cachedFile.createNewFile();
 
                 css = loadFromCache(cachedFile);
@@ -97,16 +96,20 @@ public class UserBG extends Plugin {
         }).start();
     }
 
-    private void downloadDB(File cachedFile) throws IOException {
-        log.debug("Downloading USRBG database...");
-        Http.simpleDownload(url, cachedFile);
-        log.debug("Done downloading database.");
+    public static void downloadDB(File cachedFile) {
+        try {
+            log.debug("Downloading USRBG database...");
+            Http.simpleDownload(url, cachedFile);
+            log.debug("Downloaded USRBG database.");
 
-        css = loadFromCache(cachedFile);
-        log.debug("Updated USRBG database.");
+            css = loadFromCache(cachedFile);
+            log.debug("Updated USRBG database.");
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
-    private String loadFromCache(File cache) {
+    private static String loadFromCache(File cache) {
         try {
             return new String(IOUtils.readBytes(new FileInputStream(cache)));
         } catch (Throwable e) {
@@ -121,6 +124,10 @@ public class UserBG extends Plugin {
 
     private boolean ifRecache(long lastModified) {
         return (System.currentTimeMillis() - lastModified) > (settings.getLong("cacheTime", UserBG.REFRESH_CACHE_TIME)*60*1000); // 6 hours
+    }
+
+    public static File getCacheFile(Context ctx) {
+        return new File(ctx.getCacheDir(), "db.css");
     }
 
     @Override
