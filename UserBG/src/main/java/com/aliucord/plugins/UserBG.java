@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 public class UserBG extends Plugin {
     public final static long REFRESH_CACHE_TIME = 6*60;
 
+    private static final Pattern bannerMatch = Pattern.compile("^https://cdn.discordapp.com/banners/\\d+/[a-z0-9_]+\\.\\w{3,5}\\?size=\\d+$");
     private static final String url = "https://usrbg.cumcord.com/";
     private final String regex = ".*?\\(\"(.*?)\"";
     private static String css;
@@ -39,7 +40,7 @@ public class UserBG extends Plugin {
         getDB(ctx);
 
         patcher.patch(IconUtils.class.getDeclaredMethod("getForUserBanner", long.class, String.class, Integer.class, boolean.class), new PinePatchFn(callFrame -> {
-            if (css == null) return; // could not get USRBG database in time or wasn't available
+            if (css == null || (callFrame.getResult() != null && settings.getBool("nitroBanner", true) && bannerMatch.matcher(callFrame.getResult().toString()).find())) return; // could not get USRBG database in time or wasn't available
 
             var id = (long) callFrame.args[0];
 
@@ -73,7 +74,7 @@ public class UserBG extends Plugin {
             patcher.patch(UserProfileHeaderViewModel.ViewState.Loaded.class.getDeclaredMethod("getBanner"), new PinePatchFn(callFrame -> {
                 if (css == null) return;
                 var user = ((UserProfileHeaderViewModel.ViewState.Loaded) callFrame.thisObject).getUser();
-                if (urlCache.containsKey(user.getId())) callFrame.setResult(urlCache.get(user.getId()));
+                if (callFrame.getResult() == null && (urlCache.containsKey(user.getId()) && settings.getBool("nitroBanner", true))) callFrame.setResult("https://usrbg.cumcord.com/");
             }));
         }
     }

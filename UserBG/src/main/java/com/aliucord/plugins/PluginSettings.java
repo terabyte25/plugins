@@ -49,6 +49,7 @@ public class PluginSettings extends SettingsPage {
         });
 
         addView(textInput);
+        addView(createCheckedSetting(view.getContext(), "Prioritize Nitro banner over USRBG banner", "nitroBanner", true));
         addView(createCheckedSetting(view.getContext(), "Use downscaleToFrame and partial cache (experimental)", "downscaleToFrame", false));
         addView(refreshCache);
     }
