@@ -7,5 +7,6 @@ include(":RoleContextMenu")
 include(":UserBG")
 include(":ShittyDownloadStickers")
 include(":PersistSettings")
+include(":FuckOffDiscord")
 
 rootProject.name = "HalalPlugins"
