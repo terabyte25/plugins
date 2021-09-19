@@ -13,12 +13,16 @@ import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PineInsteadFn;
 import com.aliucord.widgets.BottomSheet;
 import com.discord.stores.StoreAuthentication;
+import com.discord.stores.StoreEmoji;
+import com.discord.stores.StoreNux;
+import com.discord.stores.StoreStickers;
 import com.discord.utilities.persister.Persister;
 import com.discord.views.CheckedSetting;
 
 import java.lang.reflect.Field;
 
 import d0.z.d.m;
+import top.canyie.pine.callback.MethodReplacement;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
@@ -80,6 +84,12 @@ public class PersistSettings extends Plugin {
 
             return null;
         }));
+
+        patcher.patch(StoreEmoji.class.getDeclaredMethod("handlePreLogout"), MethodReplacement.DO_NOTHING);
+
+        patcher.patch(StoreStickers.class.getDeclaredMethod("handlePreLogout"), MethodReplacement.DO_NOTHING);
+
+        patcher.patch(StoreNux.class.getDeclaredMethod("setFirstOpen", boolean.class), MethodReplacement.DO_NOTHING);
     }
 
     @Override
@@ -88,3 +98,4 @@ public class PersistSettings extends Plugin {
         patcher.unpatchAll();
     }
 }
+z
