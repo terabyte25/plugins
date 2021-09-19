@@ -2,6 +2,8 @@ package com.aliucord.plugins
 
 import com.discord.databinding.*
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
+import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHolderHeader
+import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHolderMember
 import com.discord.widgets.settings.profile.WidgetSettingsUserProfile
 import com.discord.widgets.user.usersheet.WidgetUserSheet
 import java.lang.reflect.Field
@@ -14,6 +16,8 @@ object ReflectionExtensions {
     private lateinit var stageChannelBinding: Field
     private lateinit var threadChannelBinding: Field
     private lateinit var voiceChannelBinding: Field
+    private lateinit var roleHeaderBinding: Field
+    private lateinit var memberBinding: Field
 
     fun init() {
         textChannelBinding = WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredField("binding").apply { isAccessible = true }
@@ -22,6 +26,8 @@ object ReflectionExtensions {
         stageChannelBinding = WidgetChannelsListAdapter.ItemChannelStageVoice::class.java.getDeclaredField("binding").apply { isAccessible = true }
         threadChannelBinding = WidgetChannelsListAdapter.ItemChannelThread::class.java.getDeclaredField("binding").apply { isAccessible = true }
         voiceChannelBinding = WidgetChannelsListAdapter.ItemChannelVoice::class.java.getDeclaredField("binding").apply { isAccessible = true }
+        roleHeaderBinding = ChannelMembersListViewHolderHeader::class.java.getDeclaredField("binding").apply { isAccessible = true }
+        memberBinding = ChannelMembersListViewHolderMember::class.java.getDeclaredField("binding").apply { isAccessible = true }
     }
 
     val WidgetChannelsListAdapter.ItemChannelText.binding: WidgetChannelsListItemChannelBinding
@@ -41,4 +47,10 @@ object ReflectionExtensions {
 
     val WidgetChannelsListAdapter.ItemChannelVoice.binding: WidgetChannelsListItemChannelVoiceBinding
         get() = voiceChannelBinding[this] as WidgetChannelsListItemChannelVoiceBinding
+
+    val ChannelMembersListViewHolderHeader.binding: WidgetChannelMembersListItemHeaderBinding
+        get() = roleHeaderBinding[this] as WidgetChannelMembersListItemHeaderBinding
+
+    val ChannelMembersListViewHolderMember.binding: WidgetChannelMembersListItemUserBinding
+        get() = memberBinding[this] as WidgetChannelMembersListItemUserBinding
 }
