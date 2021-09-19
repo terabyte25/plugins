@@ -8,5 +8,6 @@ include(":UserBG")
 include(":ShittyDownloadStickers")
 include(":PersistSettings")
 include(":FuckOffDiscord")
+include(":FullBio")
 
 rootProject.name = "HalalPlugins"
