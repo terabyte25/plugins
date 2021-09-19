@@ -9,5 +9,6 @@ include(":ShittyDownloadStickers")
 include(":PersistSettings")
 include(":FuckOffDiscord")
 include(":FullBio")
+include(":MarqueeEverywhere")
 
 rootProject.name = "HalalPlugins"
