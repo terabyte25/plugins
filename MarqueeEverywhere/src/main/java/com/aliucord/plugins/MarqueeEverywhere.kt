@@ -15,6 +15,7 @@ import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.ReflectionExtensions.binding
 import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
+import com.discord.views.UsernameView
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.list.items.ChannelListItem
 import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListAdapter
@@ -25,6 +26,10 @@ import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHol
 @AliucordPlugin
 class MarqueeEverywhere : Plugin() {
     private val log = Logger()
+
+    init {
+        settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
+    }
 
     @Throws(NoSuchMethodException::class)  // Called when your plugin is started. This is the place to register command, add patches, etc
     override fun start(context: Context) {
@@ -70,7 +75,7 @@ class MarqueeEverywhere : Plugin() {
 
             patcher.patch(ChannelMembersListViewHolderMember::class.java.getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), PinePatchFn {
                 val binding = (it.thisObject as ChannelMembersListViewHolderMember).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channel_members_list_item_name", "id")))
+                setMarquee(binding.root.findViewById<UsernameView>(Utils.getResId("channel_members_list_item_name", "id")).findViewById(Utils.getResId("username_text", "id")))
             })
         }
 
@@ -105,9 +110,9 @@ class MarqueeEverywhere : Plugin() {
             super.onViewCreated(view, bundle)
 
             context?.let {
-                createCheckedSetting(it, "Channel names", "Channel names (including names of DMs) should scroll", "channelNames")
-                createCheckedSetting(it, "Member names", "Member names should scroll", "memberNames")
-                createCheckedSetting(it, "User status", "User statuses should scroll", "userStatus")
+                addView(createCheckedSetting(it, "Channel names", "Channel names (including names of DMs) should scroll", "channelNames"))
+                addView(createCheckedSetting(it, "Member names", "Member names should scroll", "memberNames"))
+                addView(createCheckedSetting(it, "User status", "User statuses should scroll", "userStatus"))
             }
         }
 

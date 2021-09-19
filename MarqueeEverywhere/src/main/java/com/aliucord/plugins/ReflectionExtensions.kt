@@ -39,8 +39,8 @@ object ReflectionExtensions {
     val WidgetChannelsListAdapter.ItemChannelPrivate.binding: WidgetChannelsListItemChannelPrivateBinding
         get() = privateChannelBinding[this] as WidgetChannelsListItemChannelPrivateBinding
 
-    val WidgetChannelsListAdapter.ItemChannelCategory.binding: WidgetChannelsListItemChannelPrivateBinding
-        get() = categoryChannelBinding[this] as WidgetChannelsListItemChannelPrivateBinding
+    val WidgetChannelsListAdapter.ItemChannelCategory.binding: WidgetChannelsListItemCategoryBinding
+        get() = categoryChannelBinding[this] as WidgetChannelsListItemCategoryBinding
 
     val WidgetChannelsListAdapter.ItemChannelThread.binding: WidgetChannelsListItemThreadBinding
         get() = threadChannelBinding[this] as WidgetChannelsListItemThreadBinding
