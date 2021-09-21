@@ -98,4 +98,3 @@ public class PersistSettings extends Plugin {
         patcher.unpatchAll();
     }
 }
-z
