@@ -2,48 +2,92 @@ package com.aliucord.plugins;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.graphics.Color;
 
 import androidx.fragment.app.FragmentManager;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.content.ContextCompat;
 
+import com.aliucord.Constants;
 import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.PineInsteadFn;
 import com.aliucord.widgets.BottomSheet;
+import com.aliucord.views.Button;
+import com.aliucord.views.Divider;
+import com.discord.api.role.GuildRole;
 import com.discord.widgets.roles.RolesListView$updateView$$inlined$forEach$lambda$1;
+import com.discord.widgets.roles.RolesListView;
+import com.discord.utilities.color.ColorCompat;
+
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import com.lytefast.flexinput.R;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
 @AliucordPlugin
 public class RoleContextMenu extends Plugin {
-    private static FragmentManager cachedFragment = null;
+    private static FragmentManager cachedFragment = Utils.appActivity.getSupportFragmentManager();
+    private static final int p = Utils.dpToPx(16);
     public static class RoleBottomSheet extends BottomSheet {
         public void onViewCreated(View view, Bundle bundle) {
             super.onViewCreated(view, bundle);
-            if (cachedFragment == null) {
-                cachedFragment = getParentFragmentManager();
-            }
-            TextView textView = new TextView(view.getContext(), null, 0, R.h.UiKit_Settings_Item_Icon);
-            textView.setText("Copy ID");
-            textView.setCompoundDrawablesWithIntrinsicBounds(R.d.ic_content_copy_white_a60_24dp, 0,0, 0);
-            textView.setOnClickListener(text -> {
-                copyToClipboard(getArguments().getString("roleId", "0"));
+            setPadding(p);
+            Context ctx = view.getContext();
+            var args = getArguments();
+            var themedColor = ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal);
+            boolean hasColor = args.getString("roleColor", "000000") != "default";
+
+            LinearLayout infoView = new LinearLayout(ctx);
+            infoView.setOrientation(LinearLayout.HORIZONTAL);
+            infoView.setVerticalGravity(Gravity.CENTER_VERTICAL);
+            infoView.setPadding(0, 0, 0, p);
+
+            SimpleDraweeView icon = new SimpleDraweeView(ctx);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(Utils.dpToPx(48), Utils.dpToPx(48)));
+            if(args.getBoolean("hasIcon", false)) {  icon.setImageURI(String.format("https://cdn.discordapp.com/role-icons/%s/%s.png", args.getString("roleId", "0"), args.getString("icon", ""))); } else {  Drawable shield = ContextCompat.getDrawable(ctx, R.d.ic_shieldstar_24dp).mutate(); shield.setTint(hasColor ? Color.parseColor("#" + args.getString("roleColor", "000000")) : themedColor); icon.setImageDrawable(shield); }
+            infoView.addView(icon);
+
+            LinearLayout details = new LinearLayout(ctx);
+            details.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMarginStart(p);
+            details.setLayoutParams(params);
+
+            details.addView(addText(ctx, args.getString("roleName", ""), 16, true));
+            if(args.getBoolean("isManaged", false)) details.addView(addText(ctx, "This role is managed by an integration", 12, false));
+            if(args.getBoolean("isHoisted", false)) details.addView(addText(ctx, "This role is hoisted", 12, false));
+            
+            infoView.addView(details);
+
+            Button copyIdBtn = new Button(ctx);
+            copyIdBtn.setText("Copy ID");
+            LinearLayout.LayoutParams copyIdParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            copyIdParams.setMargins(0, p, 0, 0);
+            copyIdBtn.setLayoutParams(copyIdParams);
+            copyIdBtn.setOnClickListener(text -> {
+                copyToClipboard(args.getString("roleId", "0"));
             });
 
-            TextView textView1 = new TextView(view.getContext(), null, 0, R.h.UiKit_Settings_Item_Icon);
-            textView1.setText("Copy Color");
-            textView1.setCompoundDrawablesWithIntrinsicBounds(R.d.ic_content_copy_white_a60_24dp, 0,0, 0);
-            textView1.setOnClickListener(text -> {
-                copyToClipboard(getArguments().getString("roleColor", "000000"));
+            Button copyColorBtn = new Button(ctx);
+            copyColorBtn.setText("Copy Color");
+            copyColorBtn.setOnClickListener(text -> {
+                copyToClipboard(args.getString("roleColor", "000000"));
             });
 
-            getLinearLayout().addView(textView);
-            getLinearLayout().addView(textView1);
+            getLinearLayout().addView(infoView);
+            getLinearLayout().addView(new Divider(ctx));
+            getLinearLayout().addView(copyIdBtn);
+            if(hasColor) getLinearLayout().addView(copyColorBtn);
         }
 
         private void copyToClipboard(String copy) {
@@ -52,6 +96,15 @@ public class RoleContextMenu extends Plugin {
             Toast.makeText(getContext(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
             clipboard.setPrimaryClip(clip);
         }
+
+        private TextView addText(Context ctx, String text, int size, boolean isBold) {
+            TextView name = new TextView(ctx);
+            name.setText(text);
+            name.setTypeface(ResourcesCompat.getFont(ctx, isBold ? Constants.Fonts.whitney_bold : Constants.Fonts.whitney_medium));
+            name.setTextSize(size);
+            name.setTextColor(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal));
+            return name;
+        }
     }
 
     private final Logger log = new Logger();
@@ -59,17 +112,24 @@ public class RoleContextMenu extends Plugin {
     @Override
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) throws NoSuchMethodException {
+        
         patcher.patch(RolesListView$updateView$$inlined$forEach$lambda$1.class.getDeclaredMethod("onClick", View.class), new PineInsteadFn(callFrame -> {
             try {
-                var role = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).$role;
+                GuildRole role = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).$role;
+                RolesListView view = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).this$0;
 
                 Bundle args = new Bundle();
-                args.putString("roleColor", String.format("%06x", role.b()));
+                args.putString("roleColor", role.b() != 0 ? String.format("%06x", role.b()) : "default");
                 args.putString("roleId", String.valueOf(role.getId()));
+                args.putString("roleName", role.g());
+                args.putBoolean("isManaged", role.e());
+                args.putBoolean("isHoisted", role.c());
+                args.putBoolean("hasIcon", role.d() != null);
+                if(role.d() != null) args.putString("icon", role.d());
 
                 var roleMenu = new RoleBottomSheet();
                 roleMenu.setArguments(args);
-                roleMenu.show(cachedFragment == null ? Utils.appActivity.getSupportFragmentManager() : cachedFragment, "Role Menu");
+                roleMenu.show(cachedFragment, "Role Menu");
             } catch (Exception e) {
                 log.error(e);
             }
