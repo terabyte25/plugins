@@ -3,6 +3,9 @@ package com.aliucord.plugins;
 import android.content.Context;
 import android.os.Bundle;
 import android.graphics.drawable.Drawable;
+import android.text.*;
+import android.text.method.LinkMovementMethod;
+import android.text.style.*;
 import android.view.View;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -11,6 +14,7 @@ import android.widget.LinearLayout;
 import android.graphics.Color;
 
 import androidx.fragment.app.FragmentManager;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.content.ContextCompat;
 
@@ -19,18 +23,23 @@ import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.PineInsteadFn;
+import com.aliucord.patcher.*;
 import com.aliucord.widgets.BottomSheet;
 import com.aliucord.views.Button;
 import com.aliucord.views.Divider;
+
 import com.discord.api.role.GuildRole;
 import com.discord.widgets.roles.RolesListView$updateView$$inlined$forEach$lambda$1;
 import com.discord.widgets.roles.RolesListView;
 import com.discord.utilities.color.ColorCompat;
+import com.discord.utilities.textprocessing.node.RoleMentionNode;
+import com.discord.utilities.guilds.RoleUtils;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import com.lytefast.flexinput.R;
+
+import java.util.*;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
@@ -132,6 +141,30 @@ public class RoleContextMenu extends Plugin {
                 roleMenu.show(cachedFragment, "Role Menu");
             } catch (Exception e) {
                 log.error(e);
+            }
+            return null;
+        }));
+
+        patcher.patch(RoleMentionNode.class.getDeclaredMethod("render", SpannableStringBuilder.class, RoleMentionNode.RenderContext.class), new PineInsteadFn(callFrame -> {
+            RoleMentionNode _this = (RoleMentionNode) callFrame.thisObject;
+            SpannableStringBuilder builder = (SpannableStringBuilder) callFrame.args[0];
+            RoleMentionNode.RenderContext nodeRc = (RoleMentionNode.RenderContext) callFrame.args[1];
+
+            int length = builder.length();
+            builder.append("@");
+            Map<Long, GuildRole> roles = nodeRc.getRoles();
+            GuildRole guildRole = roles != null ? roles.get(Long.valueOf(_this.getRoleId())) : null;
+            GuildRole role = roles != null ? roles.get(Long.valueOf(_this.getRoleId())) : null;
+            if (guildRole != null) {
+                builder.append(guildRole.g());
+                ClickableSpan cs = new ClickableSpan() { @Override public void onClick(View widget) { try { Bundle args = new Bundle(); args.putString("roleColor", role.b() != 0 ? String.format("%06x", role.b()) : "default"); args.putString("roleId", String.valueOf(role.getId())); args.putString("roleName", role.g()); args.putBoolean("isManaged", role.e()); args.putBoolean("isHoisted", role.c()); args.putBoolean("hasIcon", role.d() != null); if(role.d() != null) args.putString("icon", role.d()); var roleMenu = new RoleBottomSheet(); roleMenu.setArguments(args); roleMenu.show(cachedFragment, "Role Menu"); } catch(Throwable e) { log.error(e); } } @Override public void updateDrawState(TextPaint ds) { ds.setUnderlineText(false); }};
+                List<Object> listOf = Arrays.asList(cs, new StyleSpan(1), new ForegroundColorSpan(!RoleUtils.isDefaultColor(guildRole) ? ColorUtils.setAlphaComponent(guildRole.b(), 255) : ColorCompat.getThemedColor(nodeRc.getContext(), (int) R.b.theme_chat_mention_foreground)), new BackgroundColorSpan(!RoleUtils.isDefaultColor(guildRole) ? ColorUtils.setAlphaComponent(guildRole.b(), 25) : ColorCompat.getThemedColor(nodeRc.getContext(), (int) R.b.theme_chat_mention_background)));
+                
+                for (Object obj : listOf) {
+                    builder.setSpan(obj, length, builder.length(), 33);
+                }
+            } else {
+                builder.append("invalid-role");
             }
             return null;
         }));
