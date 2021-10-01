@@ -25,7 +25,7 @@ public class UserBG extends Plugin {
     public final static long REFRESH_CACHE_TIME = 6*60;
 
     private static final Pattern bannerMatch = Pattern.compile("^https://cdn.discordapp.com/banners/\\d+/[a-z0-9_]+\\.\\w{3,5}\\?size=\\d+$");
-    private static final String url = "https://usrbg.cumcord.com/";
+    private static final String url = "https://black-cube-web.vercel.app/api/css";
     private final String regex = ".*?\\(\"(.*?)\"";
     private static String css;
     private static final Logger log = new Logger();
