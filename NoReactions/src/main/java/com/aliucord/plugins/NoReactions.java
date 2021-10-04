@@ -14,19 +14,6 @@ import com.aliucord.patcher.PineInsteadFn;
 @SuppressWarnings("unused")
 @AliucordPlugin
 public class NoReactions extends Plugin {
-    @NonNull
-    @Override
-    // Plugin Manifest - Required
-    public Manifest getManifest() {
-        var manifest = new Manifest();
-        manifest.authors = new Manifest.Author[]{new Manifest.Author("DISCORD USERNAME", 123456789L)};
-        manifest.description = "No Reactions";
-        manifest.version = "1.0.0";
-        manifest.updateUrl = "https://raw.githubusercontent.com/terabyte25/plugins/builds/updater.json";
-        return manifest;
-    }
-
-
     @Override
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) {
