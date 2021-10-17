@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import com.aliucord.Constants;
 import com.aliucord.Logger;
 import com.aliucord.Utils;
+import com.aliucord.DimenUtils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
@@ -46,7 +47,7 @@ import java.util.*;
 @AliucordPlugin
 public class RoleContextMenu extends Plugin {
     private static FragmentManager cachedFragment = Utils.appActivity.getSupportFragmentManager();
-    private static final int p = Utils.dpToPx(16);
+    private static final int p = DimenUtils.dpToPx(16);
     public static class RoleBottomSheet extends BottomSheet {
         public void onViewCreated(View view, Bundle bundle) {
             super.onViewCreated(view, bundle);
@@ -62,7 +63,7 @@ public class RoleContextMenu extends Plugin {
             infoView.setPadding(0, 0, 0, p);
 
             SimpleDraweeView icon = new SimpleDraweeView(ctx);
-            icon.setLayoutParams(new LinearLayout.LayoutParams(Utils.dpToPx(48), Utils.dpToPx(48)));
+            icon.setLayoutParams(new LinearLayout.LayoutParams(DimenUtils.dpToPx(48), DimenUtils.dpToPx(48)));
             if(args.getBoolean("hasIcon", false)) {  icon.setImageURI(String.format("https://cdn.discordapp.com/role-icons/%s/%s.png", args.getString("roleId", "0"), args.getString("icon", ""))); } else {  Drawable shield = ContextCompat.getDrawable(ctx, R.d.ic_shieldstar_24dp).mutate(); shield.setTint(hasColor ? Color.parseColor("#" + args.getString("roleColor", "000000")) : themedColor); icon.setImageDrawable(shield); }
             infoView.addView(icon);
 
