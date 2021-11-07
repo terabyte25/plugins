@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.PinePatchFn;
+import com.aliucord.patcher.Hook;
 import com.aliucord.utils.DimenUtils;
 import com.discord.databinding.WidgetChannelsListItemChannelVoiceBinding;
 import com.discord.utilities.permissions.PermissionUtils;
@@ -32,9 +32,9 @@ public class VCID extends Plugin {
         var itemClass = WidgetChannelsListAdapter.ItemChannelVoice.class.getDeclaredField("binding");
         itemClass.setAccessible(true);
         // add the patch
-        patcher.patch(WidgetChannelsListAdapter.ItemChannelVoice.class.getDeclaredMethod("onConfigure", int.class, ChannelListItem.class), new PinePatchFn(callFrame -> {
+        patcher.patch(WidgetChannelsListAdapter.ItemChannelVoice.class.getDeclaredMethod("onConfigure", int.class, ChannelListItem.class), new Hook(callFrame -> {
             var channel = (ChannelListItemVoiceChannel) callFrame.args[1];
-            if (PermissionUtils.can(16, channel.component3())) return;
+            if (PermissionUtils.can(16, channel.component1().h())) return;
 
             try {
                 var binding = (WidgetChannelsListItemChannelVoiceBinding) itemClass.get(callFrame.thisObject);
@@ -50,13 +50,11 @@ public class VCID extends Plugin {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
-            return;
         }));
 
         final int viewId = View.generateViewId();
 
-        patcher.patch(WidgetVoiceChannelSettings.class.getDeclaredMethod("configureUI", WidgetVoiceChannelSettings.Model.class), new PinePatchFn(callFrame -> {
+        patcher.patch(WidgetVoiceChannelSettings.class.getDeclaredMethod("configureUI", WidgetVoiceChannelSettings.Model.class), new Hook(callFrame -> {
             var binding = WidgetVoiceChannelSettings.access$getBinding$p((WidgetVoiceChannelSettings) callFrame.thisObject);
             var model = (WidgetVoiceChannelSettings.Model) callFrame.args[0];
 
@@ -73,7 +71,7 @@ public class VCID extends Plugin {
             textView.setCompoundDrawablePadding(DimenUtils.dpToPx(32));
             var padding = DimenUtils.dpToPx(16);
             textView.setPadding(padding, padding, padding, padding);
-            textView.setCompoundDrawablesWithIntrinsicBounds(R.d.ic_content_copy_white_a60_24dp, 0,0, 0);
+            textView.setCompoundDrawablesWithIntrinsicBounds(R.e.ic_content_copy_white_a60_24dp, 0,0, 0);
             textView.setOnClickListener(view -> {
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 android.content.ClipData clip = android.content.ClipData.newPlainText("Copied to clipboard.", String.valueOf(model.getChannel().h()));
