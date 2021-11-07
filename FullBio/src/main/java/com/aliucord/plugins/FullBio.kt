@@ -7,12 +7,10 @@ import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
-import com.aliucord.patcher.PinePatchFn
 import com.aliucord.plugins.ReflectionExtensions.binding
 import com.discord.utilities.view.text.LinkifiedTextView
 import com.discord.widgets.settings.profile.SettingsUserProfileViewModel
 import com.discord.widgets.settings.profile.WidgetEditUserOrGuildMemberProfile
-import com.discord.widgets.settings.profile.WidgetSettingsUserProfile
 import com.discord.widgets.user.usersheet.WidgetUserSheet
 import com.discord.widgets.user.usersheet.WidgetUserSheetViewModel
 
