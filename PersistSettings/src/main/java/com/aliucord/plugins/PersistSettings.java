@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.PineInsteadFn;
+import com.aliucord.patcher.InsteadHook;
 import com.aliucord.widgets.BottomSheet;
 import com.discord.stores.StoreAuthentication;
 import com.discord.stores.StoreEmoji;
@@ -22,7 +24,6 @@ import com.discord.views.CheckedSetting;
 import java.lang.reflect.Field;
 
 import d0.z.d.m;
-import top.canyie.pine.callback.MethodReplacement;
 
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @SuppressWarnings("unused")
@@ -63,33 +64,43 @@ public class PersistSettings extends Plugin {
         Field authToken = StoreAuthentication.class.getDeclaredField("authToken");
         authToken.setAccessible(true);
 
-        patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthToken$app_productionBetaRelease", String.class), new PineInsteadFn(callFrame -> {
-            var storeAuth = (StoreAuthentication) callFrame.thisObject;
-            var str = (String) callFrame.args[0];
+        try {
+        patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthToken$app_productionCanaryRelease", String.class), new InsteadHook(callFrame -> {
+            return getObject(authToken, callFrame);
+        })); } catch (NoSuchMethodException e) {
+            patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthToken$app_productionBetaRelease", String.class), new InsteadHook(callFrame -> {
+                return getObject(authToken, callFrame);
+            }));
+        }
 
-            try {
-                authToken.set(callFrame.thisObject, str);
-            } catch (IllegalAccessException e) {
-                log.error(e);
-            }
+        patcher.patch(StoreEmoji.class.getDeclaredMethod("handlePreLogout"), InsteadHook.DO_NOTHING);
 
-            storeAuth.getPrefs().edit().putString("STORE_AUTHED_TOKEN", str).apply();
-            if (str == null && !settings.getBool("persistSetting", true)) {
-                Persister.Companion.reset();
-                SharedPreferences.Editor edit = storeAuth.getPrefs().edit();
-                m.checkExpressionValueIsNotNull(edit, "editor");
-                edit.clear();
-                edit.apply();
-            }
+        patcher.patch(StoreStickers.class.getDeclaredMethod("handlePreLogout"), InsteadHook.DO_NOTHING);
 
-            return null;
-        }));
+        patcher.patch(StoreNux.class.getDeclaredMethod("setFirstOpen", boolean.class), InsteadHook.DO_NOTHING);
+    }
 
-        patcher.patch(StoreEmoji.class.getDeclaredMethod("handlePreLogout"), MethodReplacement.DO_NOTHING);
+    @Nullable
+    private Object getObject(Field authToken, de.robv.android.xposed.XC_MethodHook.MethodHookParam callFrame) {
+        var storeAuth = (StoreAuthentication) callFrame.thisObject;
+        var str = (String) callFrame.args[0];
 
-        patcher.patch(StoreStickers.class.getDeclaredMethod("handlePreLogout"), MethodReplacement.DO_NOTHING);
+        try {
+            authToken.set(callFrame.thisObject, str);
+        } catch (IllegalAccessException e) {
+            log.error(e);
+        }
 
-        patcher.patch(StoreNux.class.getDeclaredMethod("setFirstOpen", boolean.class), MethodReplacement.DO_NOTHING);
+        storeAuth.getPrefs().edit().putString("STORE_AUTHED_TOKEN", str).apply();
+        if (str == null && !settings.getBool("persistSetting", true)) {
+            Persister.Companion.reset();
+            SharedPreferences.Editor edit = storeAuth.getPrefs().edit();
+            m.checkExpressionValueIsNotNull(edit, "editor");
+            edit.clear();
+            edit.apply();
+        }
+
+        return null;
     }
 
     @Override
