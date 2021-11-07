@@ -4,10 +4,7 @@ import com.discord.databinding.*
 import com.discord.widgets.channels.list.WidgetChannelsListAdapter
 import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHolderHeader
 import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHolderMember
-import com.discord.widgets.settings.profile.WidgetSettingsUserProfile
-import com.discord.widgets.user.usersheet.WidgetUserSheet
 import java.lang.reflect.Field
-import java.lang.reflect.Method
 
 object ReflectionExtensions {
     private lateinit var textChannelBinding: Field
