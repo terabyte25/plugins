@@ -39,7 +39,7 @@ public class RainbowCord extends Plugin {
             setActionBarTitle("RainbowCord");
 
             TextInput textInput = new TextInput(view.getContext());
-            textInput.setHint("Animation Cycle Time");
+            //textInput.setHint("Animation Cycle Time");
             textInput.getEditText().setText(String.valueOf(settings.getLong("colorSpeed", RainbowCord.DEFAULT_SPEED)));
             textInput.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
             textInput.getEditText().addTextChangedListener(new TextWatcher() {
