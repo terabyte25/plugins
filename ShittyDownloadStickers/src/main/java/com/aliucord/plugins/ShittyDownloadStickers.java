@@ -161,7 +161,7 @@ public class ShittyDownloadStickers extends Plugin {
     }
 
     private final String getCDNAssetUrl(BaseSticker baseSticker) {
-        return "https://discord.com/stickers/" + baseSticker.d() + baseSticker.b();
+        return "https://cdn.discord.com/stickers/" + baseSticker.d() + baseSticker.b();
     }
 
 }
