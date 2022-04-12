@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
-import com.aliucord.Logger
 import com.aliucord.PluginManager
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.after
 import com.aliucord.plugins.ReflectionExtensions.binding
 import com.aliucord.widgets.BottomSheet
 import com.discord.views.CheckedSetting
@@ -25,8 +24,6 @@ import com.discord.widgets.channels.memberlist.adapter.ChannelMembersListViewHol
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @AliucordPlugin
 class MarqueeEverywhere : Plugin() {
-    private val log = Logger()
-
     init {
         settingsTab = SettingsTab(PluginSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings)
     }
@@ -36,59 +33,49 @@ class MarqueeEverywhere : Plugin() {
         ReflectionExtensions.init()
 
         if (settings.getBool("channelNames", true)) {
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelText).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_item_channel_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelText>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_item_channel_name", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelVoice::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelVoice).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_item_voice_channel_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelVoice>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_item_voice_channel_name", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelStageVoice::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelStageVoice).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("stage_channel_item_voice_channel_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelStageVoice>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("stage_channel_item_voice_channel_name", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelCategory::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelCategory).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_item_category_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelCategory>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_item_category_name", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelPrivate::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelPrivate).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_list_item_private_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelPrivate>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_list_item_private_name", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelThread::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelThread).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_item_thread_name", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelThread>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_item_thread_name", "id")))
+            }
         }
 
         if (settings.getBool("memberNames", true)) {
-            patcher.patch(ChannelMembersListViewHolderHeader::class.java.getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Header::class.java), PinePatchFn {
-                val binding = (it.thisObject as ChannelMembersListViewHolderHeader).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channel_members_list_item_header_text", "id")))
-            })
+            patcher.after<ChannelMembersListViewHolderHeader>("bind", ChannelMembersListAdapter.Item.Header::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channel_members_list_item_header_text", "id")))
+            }
 
-            patcher.patch(ChannelMembersListViewHolderMember::class.java.getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), PinePatchFn {
-                val binding = (it.thisObject as ChannelMembersListViewHolderMember).binding
+            patcher.after<ChannelMembersListViewHolderMember>("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java) {
                 setMarquee(binding.root.findViewById<UsernameView>(Utils.getResId("channel_members_list_item_name", "id")).findViewById(Utils.getResId("username_text", "id")))
-            })
+            }
         }
 
         if (settings.getBool("userStatus", true)) {
-            patcher.patch(ChannelMembersListViewHolderMember::class.java.getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), PinePatchFn {
-                val binding = (it.thisObject as ChannelMembersListViewHolderMember).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channel_members_list_item_game", "id")))
-            })
+            patcher.after<ChannelMembersListViewHolderMember>("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channel_members_list_item_game", "id")))
+            }
 
-            patcher.patch(WidgetChannelsListAdapter.ItemChannelPrivate::class.java.getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), PinePatchFn {
-                val binding = (it.thisObject as WidgetChannelsListAdapter.ItemChannelPrivate).binding
-                setMarquee(binding.root.findViewById<TextView>(Utils.getResId("channels_list_item_private_desc", "id")))
-            })
+            patcher.after<WidgetChannelsListAdapter.ItemChannelPrivate>("onConfigure", Int::class.java, ChannelListItem::class.java) {
+                setMarquee(binding.root.findViewById(Utils.getResId("channels_list_item_private_desc", "id")))
+            }
         }
     }
 

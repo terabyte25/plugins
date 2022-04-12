@@ -100,7 +100,7 @@ public class Modal extends SettingsPage {
 
                 request.executeWithMultipartForm(Map.of("file", tempFile, "name", name, "description", description != null ? description : "", "tags", tags));
             } catch (Exception e) {
-                ShittyDownloadStickers.log.error(ctx, e);
+                ShittyDownloadStickers.log.errorToast(e);
             }
 
             /**

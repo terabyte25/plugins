@@ -7,14 +7,13 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.TextView;
 
-import com.aliucord.Logger;
 import com.aliucord.PluginManager;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
 import com.aliucord.fragments.SettingsPage;
-import com.aliucord.patcher.PinePatchFn;
+import com.aliucord.patcher.Hook;
 import com.aliucord.views.TextInput;
 import com.discord.utilities.view.text.SimpleDraweeSpanTextView;
 import com.discord.utilities.view.text.TextWatcher;
@@ -73,7 +72,6 @@ public class RainbowCord extends Plugin {
         }
     }
 
-    private final Logger log = new Logger();
     private static final int[] animatedColors = {0xFFe5e5ea, 0xFFfea7b9, 0xFFcd9aec, 0xFFb5b8f8, 0xFF87beff, 0xFF97f2c3, 0xFFbbe061, 0xFFf9e560, 0xFFffb43f, 0xFFcfa075, 0xFFe5e5ea};
     private static final long DEFAULT_SPEED = 5000;
 
@@ -85,13 +83,13 @@ public class RainbowCord extends Plugin {
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) throws NoSuchMethodException {
         if (settings.getBool("rainbowTyping", true)) {
-            patcher.patch(WidgetChatInputEditText.class.getDeclaredConstructor(FlexEditText.class, MessageDraftsRepo.class), new PinePatchFn(callFrame -> {
+            patcher.patch(WidgetChatInputEditText.class.getDeclaredConstructor(FlexEditText.class, MessageDraftsRepo.class), new Hook(callFrame -> {
                 setValueAnimator((FlexEditText) callFrame.args[0]);
             }));
         }
 
         if (settings.getBool("rainbowMessages", false)) {
-            patcher.patch(WidgetChatListAdapterItemMessage.class.getDeclaredMethod("processMessageText", SimpleDraweeSpanTextView.class, MessageEntry.class), new PinePatchFn(callFrame -> {
+            patcher.patch(WidgetChatListAdapterItemMessage.class.getDeclaredMethod("processMessageText", SimpleDraweeSpanTextView.class, MessageEntry.class), new Hook(callFrame -> {
                 setValueAnimator((SimpleDraweeSpanTextView) callFrame.args[0]);
             }));
         }

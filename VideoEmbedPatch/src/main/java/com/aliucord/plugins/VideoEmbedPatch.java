@@ -5,13 +5,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
-import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.PineInsteadFn;
-import com.aliucord.patcher.PinePrePatchFn;
+import com.aliucord.patcher.InsteadHook;
+import com.aliucord.patcher.PreHook;
 import com.aliucord.widgets.BottomSheet;
 import com.discord.api.message.embed.EmbedType;
 import com.discord.api.message.embed.MessageEmbed;
@@ -58,8 +57,6 @@ public class VideoEmbedPatch extends Plugin {
         }
     }
 
-    private final Logger log = new Logger();
-
     public VideoEmbedPatch() {
         settingsTab = new SettingsTab(PluginSettings.class, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings);
     }
@@ -72,7 +69,7 @@ public class VideoEmbedPatch extends Plugin {
     public void start(Context context) throws Throwable {
         if (settings.getBool("correctCopy", true)) {
             // add the patch
-            patcher.patch(IntentUtils.class.getDeclaredMethod("performChooserSendIntent", Context.class, String.class, CharSequence.class), new PinePrePatchFn(callFrame -> {
+            patcher.patch(IntentUtils.class.getDeclaredMethod("performChooserSendIntent", Context.class, String.class, CharSequence.class), new PreHook(callFrame -> {
                 callFrame.args[1] = fixMediaUrl(callFrame.args[1].toString());
             }));
         }
@@ -81,7 +78,7 @@ public class VideoEmbedPatch extends Plugin {
             var field = MessagePreprocessor.class.getDeclaredField("embeds");
             field.setAccessible(true);
 
-            patcher.patch("com.discord.utilities.textprocessing.MessagePreprocessor", "stripSimpleEmbedLink", new Class<?>[]{Collection.class}, new PineInsteadFn(callFrame -> {
+            patcher.patch("com.discord.utilities.textprocessing.MessagePreprocessor", "stripSimpleEmbedLink", new Class<?>[]{Collection.class}, new InsteadHook(callFrame -> {
                 var collection = (Collection<Node<MessageRenderContext>>) callFrame.args[0];
 
                 // fucky reflection shit that should not be done
@@ -95,7 +92,7 @@ public class VideoEmbedPatch extends Plugin {
                         }
                     }
                 } catch (IllegalAccessException e) {
-                    log.error(context, e);
+                    logger.errorToast(e);
                 }
 
                 return null;
