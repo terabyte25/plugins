@@ -4,10 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 
-import com.aliucord.Logger;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.PinePrePatchFn;
+import com.aliucord.patcher.PreHook;
 import com.discord.databinding.WidgetManageReactionsEmojiBinding;
 import com.discord.widgets.chat.managereactions.ManageReactionsEmojisAdapter;
 
@@ -15,22 +14,20 @@ import com.discord.widgets.chat.managereactions.ManageReactionsEmojisAdapter;
 @SuppressWarnings("unused")
 @AliucordPlugin
 public class ReactionEmojiName extends Plugin {
-    private final Logger log = new Logger();
-
     @SuppressLint("SetTextI18n")
     @Override
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) throws Throwable {
         var field = ManageReactionsEmojisAdapter.ReactionEmojiViewHolder.class.getDeclaredField("binding");
         field.setAccessible(true);
-        patcher.patch(ManageReactionsEmojisAdapter.ReactionEmojiViewHolder.class.getDeclaredMethod("onConfigure", new Class<?>[] {int.class, ManageReactionsEmojisAdapter.ReactionEmojiItem.class}), new PinePrePatchFn(callFrame -> {
+        patcher.patch(ManageReactionsEmojisAdapter.ReactionEmojiViewHolder.class.getDeclaredMethod("onConfigure", int.class, ManageReactionsEmojisAdapter.ReactionEmojiItem.class), new PreHook(callFrame -> {
             try {
                 WidgetManageReactionsEmojiBinding binding = (WidgetManageReactionsEmojiBinding) field.get(callFrame.thisObject);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.a.setTooltipText(((ManageReactionsEmojisAdapter.ReactionEmojiItem)callFrame.args[1]).getReaction().b().d());
                 }
             } catch (Exception e) {
-                log.error(e);
+                logger.error(e);
             }
         }));
     }

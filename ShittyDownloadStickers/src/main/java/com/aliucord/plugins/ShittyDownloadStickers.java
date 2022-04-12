@@ -114,7 +114,7 @@ public class ShittyDownloadStickers extends Plugin {
 
                 rootLayout.addView(pluginButtonLayout, idx);
             } catch (Exception e) {
-                log.error(context, e);
+                logger.errorToast(e);
             }
         }));
     }
@@ -136,7 +136,7 @@ public class ShittyDownloadStickers extends Plugin {
                         Utils.showToast(String.format("Saved sticker to %s", stickerSave.getAbsolutePath()));
                         callSelf.run();
                     } catch (Throwable e) {
-                        log.error(context, "Failed to download sticker.");
+                        logger.errorToast("Failed to download sticker.", e);
                     }
                 });
             });

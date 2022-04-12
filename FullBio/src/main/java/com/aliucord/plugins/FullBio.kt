@@ -2,7 +2,6 @@ package com.aliucord.plugins
 
 import android.content.Context
 import android.widget.TextView
-import com.aliucord.Logger
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
@@ -17,8 +16,6 @@ import com.discord.widgets.user.usersheet.WidgetUserSheetViewModel
 // This class is never used so your IDE will likely complain. Let's make it shut up!
 @AliucordPlugin
 class FullBio : Plugin() {
-    private val log = Logger()
-
     @Throws(NoSuchMethodException::class)  // Called when your plugin is started. This is the place to register command, add patches, etc
     override fun start(context: Context) {
         ReflectionExtensions.init()

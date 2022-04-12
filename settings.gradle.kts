@@ -3,7 +3,7 @@ include(":VCID")
 include(":VideoEmbedPatch")
 include(":ReactionEmojiName")
 include(":RainbowCord")
-include(":UserBG")
+//include(":UserBG") // Superseded by UserBg from OmegaSunkey
 include(":ShittyDownloadStickers")
 include(":PersistSettings")
 include(":FuckOffDiscord")

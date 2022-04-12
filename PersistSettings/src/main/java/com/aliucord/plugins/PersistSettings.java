@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.aliucord.Logger;
 import com.aliucord.Utils;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.api.SettingsAPI;
@@ -52,8 +51,6 @@ public class PersistSettings extends Plugin {
         }
     }
 
-    private final Logger log = new Logger();
-
     public PersistSettings() {
         settingsTab = new SettingsTab(PluginSettings.class, SettingsTab.Type.BOTTOM_SHEET).withArgs(settings);
     }
@@ -88,7 +85,7 @@ public class PersistSettings extends Plugin {
         try {
             authToken.set(callFrame.thisObject, str);
         } catch (IllegalAccessException e) {
-            log.error(e);
+            logger.error(e);
         }
 
         storeAuth.getPrefs().edit().putString("STORE_AUTHED_TOKEN", str).apply();
