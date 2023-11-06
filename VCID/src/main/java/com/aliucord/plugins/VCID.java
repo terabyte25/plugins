@@ -34,13 +34,13 @@ public class VCID extends Plugin {
         // add the patch
         patcher.patch(WidgetChannelsListAdapter.ItemChannelVoice.class.getDeclaredMethod("onConfigure", int.class, ChannelListItem.class), new Hook(callFrame -> {
             var channel = (ChannelListItemVoiceChannel) callFrame.args[1];
-            if (PermissionUtils.can(16, channel.component1().h())) return;
+            if (PermissionUtils.can(16, channel.component1().g())) return;
 
             try {
                 var binding = (WidgetChannelsListItemChannelVoiceBinding) itemClass.get(callFrame.thisObject);
                 binding.a.setOnLongClickListener(view -> {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied to clipboard.", String.valueOf(channel.getChannel().h()));
+                    android.content.ClipData clip = android.content.ClipData.newPlainText("VCID", String.valueOf(channel.getChannel().k()));
                     int duration = Toast.LENGTH_SHORT;
                     Toast.makeText(context, "Copied to clipboard.", duration).show();
                     clipboard.setPrimaryClip(clip);
@@ -74,7 +74,7 @@ public class VCID extends Plugin {
             textView.setCompoundDrawablesWithIntrinsicBounds(R.e.ic_content_copy_white_a60_24dp, 0,0, 0);
             textView.setOnClickListener(view -> {
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied to clipboard.", String.valueOf(model.getChannel().h()));
+                android.content.ClipData clip = android.content.ClipData.newPlainText("VCID", String.valueOf(model.getChannel().k()));
                 int duration = Toast.LENGTH_SHORT;
                 Toast.makeText(context, "Copied to clipboard.", duration).show();
                 clipboard.setPrimaryClip(clip);
