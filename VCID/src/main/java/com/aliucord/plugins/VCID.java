@@ -34,7 +34,7 @@ public class VCID extends Plugin {
         // add the patch
         patcher.patch(WidgetChannelsListAdapter.ItemChannelVoice.class.getDeclaredMethod("onConfigure", int.class, ChannelListItem.class), new Hook(callFrame -> {
             var channel = (ChannelListItemVoiceChannel) callFrame.args[1];
-            if (PermissionUtils.can(16, channel.component1().g())) return;
+            if (PermissionUtils.can(16, channel.component1().k())) return;
 
             try {
                 var binding = (WidgetChannelsListItemChannelVoiceBinding) itemClass.get(callFrame.thisObject);
