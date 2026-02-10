@@ -70,7 +70,7 @@ public class PersistSettings extends Plugin {
         Method mCacheAuthState = AuthStateCache.class.getDeclaredMethod("cacheAuthState", AuthState.class);
         mCacheAuthState.setAccessible(true);
 
-        try {patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthState$app_productionGoogleRelease", AuthState.class), new InsteadHook(callFrame -> {
+        patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthState$app_productionGoogleRelease", AuthState.class), new InsteadHook(callFrame -> {
             var storeAuth = (StoreAuthentication) callFrame.thisObject;
             var authState = (AuthState) callFrame.args[0];
  
@@ -91,7 +91,7 @@ public class PersistSettings extends Plugin {
             }
 
             return null;
-        })); } catch (NoSuchMethodException e) {};
+        }));
 
         patcher.patch(StoreEmoji.class.getDeclaredMethod("handlePreLogout"), InsteadHook.DO_NOTHING);
 
