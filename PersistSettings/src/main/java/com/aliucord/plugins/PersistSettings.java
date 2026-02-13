@@ -73,7 +73,7 @@ public class PersistSettings extends Plugin {
         patcher.patch(StoreAuthentication.class.getDeclaredMethod("handleAuthState$app_productionGoogleRelease", AuthState.class), new InsteadHook(callFrame -> {
             var storeAuth = (StoreAuthentication) callFrame.thisObject;
             var authState = (AuthState) callFrame.args[0];
- 
+
             try {
                 fAuthState.set(storeAuth, authState);
                 var authStateCache = (AuthStateCache) fAuthStateCache.get(storeAuth);
@@ -82,7 +82,7 @@ public class PersistSettings extends Plugin {
                 logger.error(e);
             }
 
-            if (authState == null&& !settings.getBool("persistSetting", true)) {
+            if (authState == null && !settings.getBool("persistSetting", true)) {
                 Persister.Companion.reset();
                 SharedPreferences.Editor editorEdit = storeAuth.getPrefs().edit();
                 m.checkNotNullExpressionValue(editorEdit, "editor");
