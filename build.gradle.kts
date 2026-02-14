@@ -11,8 +11,8 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.0.4")
-        classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+        classpath("com.aliucord:gradle:bbcd8a8")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.32")
     }
 }
 
@@ -73,7 +73,7 @@ subprojects {
         val compileOnly by configurations
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
-        compileOnly("com.aliucord:Aliucord:main-SNAPSHOT")
+        compileOnly("com.aliucord:Aliucord:2.1.1")
 //        compileOnly("com.github.Aliucord:Aliucord:unspecified")
     }
 }
